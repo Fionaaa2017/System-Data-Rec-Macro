@@ -1,0 +1,128 @@
+Sub Sort1()
+'
+' Sort1 Macro
+'
+ 
+    Columns("A:A").Select
+    Selection.TextToColumns Destination:=Range("A1"), DataType:=xlDelimited, _
+        TextQualifier:=xlDoubleQuote, ConsecutiveDelimiter:=False, Tab:=True, _
+        Semicolon:=False, Comma:=False, Space:=False, Other:=False, FieldInfo _
+        :=Array(Array(1, 1), Array(2, 1), Array(3, 1), Array(4, 1), Array(5, 1), Array(6, 1), _
+        Array(7, 1), Array(8, 1), Array(9, 1), Array(10, 1), Array(11, 1), Array(12, 1), Array(13, 1 _
+        ), Array(14, 1), Array(15, 1), Array(16, 1), Array(17, 1), Array(18, 1), Array(19, 1), Array _
+        (20, 1), Array(21, 1), Array(22, 1), Array(23, 1), Array(24, 1)), TrailingMinusNumbers _
+        :=True
+    Columns("D:D").EntireColumn.AutoFit
+    Range("E4").Select
+    Selection.AutoFilter
+    ActiveSheet.Range("$A$1:$X$1000000").AutoFilter Field:=16, Criteria1:= _
+        "Equities"
+    ActiveSheet.Range("$A$1:$X$1000000").AutoFilter Field:=3, Criteria1:="C"
+    Range("A1:X1000000").Select
+    Range("D2961").Activate
+    Selection.Copy
+    ActiveWindow.WindowState = xlMinimized
+    Range("E10").Select
+    ActiveWindow.WindowState = xlMaximized
+   
+    Workbooks("MX Final.xlsm").Activate
+   
+    Sheets.Add After:=Sheets(Sheets.Count)
+    ActiveSheet.Paste
+    Columns("D:D").Select
+    Application.CutCopyMode = False
+    Range("D2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    Selection.NumberFormat = "m/d/yyyy"
+    Columns("F:F").Select
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Columns("E:E").Select
+    Selection.TextToColumns Destination:=Range("E1"), DataType:=xlDelimited, _
+        TextQualifier:=xlDoubleQuote, ConsecutiveDelimiter:=True, Tab:=True, _
+        Semicolon:=False, Comma:=False, Space:=True, Other:=False, FieldInfo _
+        :=Array(Array(1, 1), Array(2, 1), Array(3, 9)), TrailingMinusNumbers:=True
+    Range("F10").Select
+End Sub
+ 
+ 
+Sub findtimebreak()
+Dim wb As Workbook
+Dim ws, ws1 As Worksheets
+ 
+Set wb = ThisWorkbook
+ 
+Dim Str As String
+Str = InputBox("input the name of worksheet ")
+ 
+Set ws = wb.Sheets(Str)
+ 
+'Set wb2 = Workbooks(strfile4)
+'Set wsSophis1 = wb.Sheets("Sophis")
+'Set wsSophis2 = wb2.Sheets("Sophis")
+ 
+Dim iLastrowA, iRowDate, iRow As Long
+Dim iLastrowTicker, iLastrowMXTicker As Long
+Dim iSumISM, iSumMX As Long
+Dim iISM, iMX As Long
+'
+ 
+ 
+Dim strTicker, strISMDate, strMXDate As String
+ 
+With Application
+        .ScreenUpdating = False
+        .EnableEvents = False
+        .Calculate
+        .Calculation = xlCalculationManual
+        .DisplayStatusBar = False
+    End With
+   
+iLastrowA = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+'iLastrow = wsAmend.Cells(wsAmend.Rows.Count, 1).End(xlUp).Row
+ 
+ 
+For i = 3 To iLastrowA
+ 
+        If ws.Cells(i, 1) = "" Then
+        x = ws.Cells(i, 1).End(xlUp)
+        Else
+        x = ws.Cells(i, 1)
+        End If
+        'define ticker value
+    If x <> "ISM" Then
+        strTicker = x
+'        iSumISM = ws.Cells(i, 3)
+     Count = Application.WorksheetFunction.CountIf(ws.Columns(7), strTicker)
+    If Count = 1 And ws.Cells(i, 2) <> "" Then
+       iRow = ws.Columns(7).Find(what:=strTicker, LookAt:=xlWhole).Row
+       iLastrowTicker = ws.Cells(i, 1).End(xlDown).Row - 1
+       iLastrowMXTicker = ws.Cells(iRow, 7).End(xlDown).Row - 1
+      
+       If i <> iLastrowTicker + 1 Then
+           strISMDate = ws.Cells(i, 2)
+           count1 = Application.WorksheetFunction.CountIf(Range(Cells(iRow, 8), Cells(iLastrowMXTicker, 8)), strISMDate)
+           If count1 = 1 Then
+          iRowDate = ws.Range(Cells(iRow, 8), Cells(iLastrowMXTicker, 8)).Find(what:=strISMDate, LookAt:=xlWhole).Row
+            ws.Cells(i, 4) = ws.Cells(iRowDate, 9)
+            Else
+          ws.Cells(i, 4) = ""
+          End If
+        Else
+            i = iLastrowTicker + 1
+        End If
+     End If
+    End If
+  
+Next
+ 
+ 
+With Application
+        .ScreenUpdating = True
+        .EnableEvents = True
+        .Calculate
+        .Calculation = xlCalculationAutomatic
+        .DisplayStatusBar = True
+    End With
+ 
+ 
+End Sub
