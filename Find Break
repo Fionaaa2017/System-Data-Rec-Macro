@@ -1,0 +1,77 @@
+Sub findtimebreak()
+Dim wb As Workbook
+Dim ws, ws1 As Worksheets
+ 
+Set wb = ThisWorkbook
+Set ws = wb.Sheets("Ticker MX & ISM")
+ 
+'Set wb2 = Workbooks(strfile4)
+'Set wsSophis1 = wb.Sheets("Sophis")
+'Set wsSophis2 = wb2.Sheets("Sophis")
+ 
+Dim iLastrowA, iRowDate, iRow As Long
+Dim iLastrowTicker, iLastrowMXTicker As Long
+Dim iSumISM, iSumMX As Long
+Dim iISM, iMX As Long
+'
+ 
+ 
+Dim strTicker, strISMDate, strMXDate As String
+ 
+With Application
+        .ScreenUpdating = False
+        .EnableEvents = False
+        .Calculate
+        .Calculation = xlCalculationManual
+        .DisplayStatusBar = False
+    End With
+   
+iLastrowA = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+'iLastrow = wsAmend.Cells(wsAmend.Rows.Count, 1).End(xlUp).Row
+ 
+ 
+For i = 3 To iLastrowA
+ 
+        If ws.Cells(i, 1) = "" Then
+        x = ws.Cells(i, 1).End(xlUp)
+        Else
+        x = ws.Cells(i, 1)
+        End If
+        'define ticker value
+    If x <> "ISM" Then
+        strTicker = x
+'        iSumISM = ws.Cells(i, 3)
+     Count = Application.WorksheetFunction.CountIf(ws.Columns(7), strTicker)
+    If Count = 1 And ws.Cells(i, 2) <> "" Then
+       iRow = ws.Columns(7).Find(what:=strTicker, LookAt:=xlWhole).Row
+       iLastrowTicker = ws.Cells(i, 1).End(xlDown).Row - 1
+       iLastrowMXTicker = ws.Cells(iRow, 7).End(xlDown).Row - 1
+      
+       If i <> iLastrowTicker + 1 Then
+           strISMDate = ws.Cells(i, 2)
+           count1 = Application.WorksheetFunction.CountIf(Range(Cells(iRow, 8), Cells(iLastrowMXTicker, 8)), strISMDate)
+           If count1 = 1 Then
+          iRowDate = ws.Range(Cells(iRow, 8), Cells(iLastrowMXTicker, 8)).Find(what:=strISMDate, LookAt:=xlWhole).Row
+            ws.Cells(i, 4) = ws.Cells(iRowDate, 9)
+            Else
+          ws.Cells(i, 4) = ""
+          End If
+        Else
+            i = iLastrowTicker + 1
+        End If
+     End If
+    End If
+  
+Next
+ 
+ 
+With Application
+        .ScreenUpdating = True
+        .EnableEvents = True
+        .Calculate
+        .Calculation = xlCalculationAutomatic
+        .DisplayStatusBar = True
+    End With
+ 
+ 
+End Sub
