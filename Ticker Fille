@@ -1,0 +1,23 @@
+Sub tickerfill()
+ 
+Dim wb As Workbook
+Dim ws, ws1 As Worksheets
+Dim iLastrow As Long
+Dim strSheet As String
+ 
+Set wb = ThisWorkbook
+ 
+strSheet = InputBox("Input the name of sheets you are working on")
+ 
+Set ws = wb.Sheets(strSheet)
+ 
+iLastrow = ws.Cells(ws.Rows.Count, 2).End(xlUp).Row
+ 
+''iLastrow1 = wsToday.Cells(wsToday.Rows.Count, 2).End(xlUp).Row
+ 
+For i = 2 To iLastrow
+    a = ws.Cells(i, 1)
+    If ws.Cells(i, 1) = "" Then
+        ws.Cells(i, 1) = ws.Cells(i - 1, 1)
+    End If
+Next
